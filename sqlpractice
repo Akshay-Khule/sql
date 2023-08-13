@@ -1,0 +1,308 @@
+CREATE SCHEMA test;
+
+
+-- Creating Author table
+CREATE TABLE test.Author (
+    author_id INT PRIMARY KEY,
+    author_name VARCHAR(50)
+);
+
+-- Creating Book table
+CREATE TABLE test.Book (
+    book_id INT PRIMARY KEY,
+    book_title VARCHAR(100)
+);
+
+CREATE TABLE test.Author_Book(
+	author_id INT,
+	book_id INT,
+	FOREIGN KEY(author_id) REFERENCES test.Author(author_id),
+	FOREIGN KEY(book_id) REFERENCES test.Book(book_id),
+);
+
+CREATE TABLE test.Book_Author (
+    book_id INT,
+    author_id INT,
+    PRIMARY KEY (book_id, author_id),
+    FOREIGN KEY (book_id) REFERENCES test.Book(book_id),
+    FOREIGN KEY (author_id) REFERENCES test.Author(author_id)
+);
+
+INSERT INTO test.Author (author_id, author_name)
+VALUES
+    (1, 'J.K. Rowling'),
+    (2, 'George Orwell'),
+    (3, 'Jane Austen'),
+    (4, 'Stephen King'),
+    (5, 'Harper Lee');
+INSERT INTO TEST.Book (book_id, book_title)
+VALUES
+    (101, 'Harry Potter and the Sorcerer''s Stone'),
+    (102, '1984'),
+    (103, 'Pride and Prejudice'),
+    (104, 'The Shining'),
+    (105, 'To Kill a Mockingbird');
+INSERT INTO TEST.Book_Author (book_id, author_id)
+VALUES
+    (101, 1),
+    (102, 2),
+    (103, 3),
+    (104, 4),
+    (105, 5),
+    (101, 2),
+    (105, 4);
+
+select * from test.Author
+select * from test.Book
+select * from test.Book_Author
+
+select b.*, ba.* from test.Book b join test.Book_Author ba on
+ba.book_id = b.book_id join test.Author a on ba.author_id  = a.author_id where a.author_name ='George Orwell';
+
+select b.*, ba.*, a.* from test.Book b join test.Book_Author ba on ba.book_id = b.book_id and b.book_title='To Kill a Mockingbird' join test.Author a
+on a.author_id=ba.author_id;
+
+select ba.* , b.* from test.Book b join test.Book_Author ba on ba.book_id = b.book_id group by b.book_title having count(ba.author_id) >1 ;
+
+select a.author_name from  test.Author a join test.Book_Author ba on a.author_id = ba.author_id join test.Book b on ba.book_id = b.book_id group 
+by a.author_id, a.author_name having count(b.book_id)>1;
+
+select a.author_name, b.book_title from  test.Author a join test.Book_Author ba on a.author_id = ba.author_id join test.Book b on ba.book_id = b.book_id order by a.author_name
+SELECT a.author_name, b.book_title
+FROM test.Author a
+JOIN test.Book_Author ba ON a.author_id = ba.author_id
+JOIN test.Book b ON ba.book_id = b.book_id
+--GROUP BY a.author_id, a.author_name
+ORDER BY a.author_name;
+===============
+
+-- Customer Table
+CREATE TABLE test.Customer (
+    CustomerID INT PRIMARY KEY,
+    CustomerName VARCHAR(50),
+    City VARCHAR(50),
+    Country VARCHAR(50)
+);
+
+
+-- Order Table
+CREATE TABLE test.Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    ShipmentMode VARCHAR(20),
+    IsDelayed BIT
+);
+
+-- Sample Data for Customer Table
+INSERT INTO test.Customer (CustomerID, CustomerName, City, Country)
+VALUES
+    (1, 'John Doe', 'New York', 'USA'),
+    (2, 'Jane Smith', 'London', 'UK'),
+    (3, 'Alice Johnson', 'Sydney', 'Australia');
+
+-- Sample Data for Order Table
+INSERT INTO test.Orders (OrderID, CustomerID, OrderDate, TotalAmount, ShipmentMode, IsDelayed)
+VALUES
+    (101, 1, '2023-05-01', 500.00, 'Air', 0),
+    (102, 1, '2023-05-10', 750.00, 'Sea', 1),
+    (103, 2, '2023-05-05', 300.00, 'Road', 0),
+    (104, 3, '2023-05-15', 1000.00, 'Air', 0),
+    (105, 2, '2023-05-20', 450.00, 'Road', 1);
+
+
+
+select c.CustomerName, count(o.OrderID) from test.Customer c join test.Orders o on  c.CustomerID = o.CustomerID group by c.CustomerName ;
+
+select c.CustomerName , sum( o.TotalAmount) from test.Customer c join test.Orders o on 
+c.CustomerID = o.CustomerID group by c.CustomerName
+
+select ShipmentMode, AVG(TotalAmount), count(ShipmentMode) from test.Orders group by ShipmentMode;
+select c.Country, sum( o.TotalAmount) from  test.Customer c join test.Orders o on c.CustomerID = o.CustomerID group by c.Country
+-----
+CREATE TABLE match ( team varchar(20) ) 
+INSERT INTO match (team) VALUES ('India'), ('Pak'), ('Aus'), ('Eng')
+
+----------------
+
+CREATE TABLE test.Employee (
+    EmployeeeID INT PRIMARY KEY,
+    EmployeeeName VARCHAR(50),
+    ManagerID INT
+);
+
+INSERT INTO test.Employee (EmployeeeID, EmployeeeName, ManagerID)
+VALUES
+    (1, 'Agni',  3),
+    (2, 'Akash', 4),
+	(3, 'Darti', 2),
+	(4, 'vayu',  3)
+
+--
+select a.EmployeeeName, b.EmployeeeName as Manager from test.Employee a join test.Employee b on
+a.ManagerID = b.EmployeeeID ;
+--
+-- Customers table
+CREATE TABLE sample.Customers (
+    CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Email VARCHAR(100),
+    Age INT
+);
+
+INSERT INTO sample.Customers (CustomerID, FirstName, LastName, Email, Age)
+VALUES
+    (1, 'John', 'Doe', 'john@example.com', 30),
+    (2, 'Jane', 'Smith', 'jane@example.com', 28),
+    (3, 'Michael', 'Johnson', 'michael@example.com', 35);
+
+-- Orders table
+CREATE TABLE sample.Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+);
+
+INSERT INTO sample.Orders (OrderID, CustomerID, OrderDate, TotalAmount)
+VALUES
+    (101, 1, '2023-05-01', 150.50),
+    (102, 2, '2023-05-02', 75.25),
+    (103, 1, '2023-05-03', 200.00),
+    (104, 3, '2023-05-04', 320.80);
+
+-- Products table
+CREATE TABLE sample.Products (
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Category VARCHAR(50),
+    Price DECIMAL(10, 2)
+);
+
+INSERT INTO sample.Products (ProductID, ProductName, Category, Price)
+VALUES
+    (501, 'Laptop', 'Electronics', 800.00),
+    (502, 'T-Shirt', 'Apparel', 20.00),
+    (503, 'Smartphone', 'Electronics', 500.00),
+    (504, 'Shoes', 'Apparel', 50.00),
+    (505, 'Headphones', 'Electronics', 100.00);
+
+-- OrderDetails table (Many-to-many)
+CREATE TABLE sample.OrderDetails (
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    PRIMARY KEY (OrderID, ProductID),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+INSERT INTO sample.OrderDetails (OrderID, ProductID, Quantity)
+VALUES
+    (101, 501, 1),
+    (101, 502, 2),
+    (102, 503, 1),
+    (103, 505, 1),
+    (104, 501, 2),
+    (104, 503, 1);
+
+-------
+CREATE TABLE tmp.Customers (
+    CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(50),
+    LastName VARCHAR(50),
+    Email VARCHAR(100),
+    Age INT
+);
+INSERT INTO tmp.Customers (CustomerID, FirstName, LastName, Email, Age)
+VALUES
+    (1, 'John', 'Doe', 'john@example.com', 30),
+    (2, 'Jane', 'Smith', 'jane@example.com', 28),
+    (3, 'Michael', 'Johnson', 'michael@example.com', 35);
+
+CREATE TABLE tmp.Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT,
+    OrderDate DATE,
+    TotalAmount DECIMAL(10, 2),
+    FOREIGN KEY (CustomerID) REFERENCES tmp.Customers(CustomerID)
+);
+INSERT INTO tmp.Orders (OrderID, CustomerID, OrderDate, TotalAmount)
+VALUES
+    (101, 1, '2023-05-01', 150.50),
+    (102, 2, '2023-05-02', 75.25),
+    (103, 1, '2023-05-03', 200.00),
+    (104, 3, '2023-05-04', 320.80);
+CREATE TABLE tmp.Products (
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Category VARCHAR(50),
+    Price DECIMAL(10, 2)
+);
+INSERT INTO tmp.Products (ProductID, ProductName, Category, Price)
+VALUES
+    (501, 'Laptop', 'Electronics', 800.00),
+    (502, 'T-Shirt', 'Apparel', 20.00),
+    (503, 'Smartphone', 'Electronics', 500.00),
+    (504, 'Shoes', 'Apparel', 50.00),
+    (505, 'Headphones', 'Electronics', 100.00);
+
+CREATE TABLE tmp.OrderDetails (
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    PRIMARY KEY (OrderID, ProductID),
+    FOREIGN KEY (OrderID) REFERENCES tmp.Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES tmp.Products(ProductID);
+
+INSERT INTO tmp.OrderDetails (OrderID, ProductID, Quantity)
+VALUES
+    (101, 501, 1),
+    (101, 502, 2),
+    (102, 503, 1),
+    (103, 505, 1),
+    (104, 501, 2),
+    (104, 503, 1);
+);
+select c.FirstName, o.OrderID from tmp.Customers c join tmp.Orders o on c.CustomerID = o.CustomerID;
+select c.FirstName, sum(o.TotalAmount) from tmp.Customers c join tmp.Orders o on c.CustomerID = o.CustomerID group by o.CustomerID, c.FirstName;
+
+select c.FirstName, o.TotalAmount from tmp.Customers c join tmp.Orders o on c.CustomerID = o.CustomerID where o.TotalAmount > (select avg(o.TotalAmount) as avgn from tmp.Orders o);
+
+select c.FirstName,  sum(o.TotalAmount) as tsum  from tmp.Customers c join tmp.Orders o on c.CustomerID = o.CustomerID group by FirstName having 
+sum(o.TotalAmount) > (select avg(o.TotalAmount) as avgn from tmp.Orders o);
+ ;
+
+ SELECT o.OrderID, p.ProductName, od.Quantity
+FROM tmp.Orders o
+JOIN tmp.OrderDetails od ON o.OrderID = od.OrderID
+JOIN tmp.Products p ON od.ProductID = p.ProductID;
+
+select o.OrderID, o.Quantity, p.ProductName from tmp.OrderDetails o join tmp.Products p on o.ProductID = p.ProductID;
+
+select od.OrderID, p.ProductName, c.FirstName from tmp.OrderDetails od join tmp.Products p on p.ProductID = od.ProductID 
+join tmp.Orders o on od.OrderID = o.OrderID join tmp.Customers c on c.CustomerID = o.CustomerID
+where p.ProductName ='Laptop' ;
+
+select * from tmp.OrderDetails od join tmp.Products p on p.ProductID = od.ProductID 
+join  tmp.Orders o on o.OrderID = od.OrderID join tmp.Customers c on  c.CustomerID = o.CustomerID
+where p.Category = 'Apparel';
+
+select * from tmp.Customers where CustomerID = (
+select o.CustomerID from tmp.Customers c join tmp.Orders o on  c.CustomerID = o.CustomerID 
+group by o.CustomerID having count(o.CustomerID) >1);
+
+select p.ProductID, p.ProductName from tmp.OrderDetails od join tmp.Products p on p.ProductID = od.ProductID group by p.ProductID , p.ProductName having count(p.ProductID )>1;
+
+SELECT p.ProductName, COUNT(od.ProductID) AS OrderCount
+FROM tmp.Products p
+JOIN tmp.OrderDetails od ON p.ProductID = od.ProductID
+GROUP BY p.ProductName
+HAVING OrderCount > 1;
+
+
+
+
